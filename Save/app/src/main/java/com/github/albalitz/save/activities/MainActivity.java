@@ -131,6 +131,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_export:
                 showExportConfirmation(SavedLinksExporter.export(this, savedLinks));
                 return true;
+            case R.id.action_about:
+                ActivityUtils.showAboutDialog(this);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

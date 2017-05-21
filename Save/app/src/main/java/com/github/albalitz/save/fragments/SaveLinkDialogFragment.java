@@ -10,8 +10,6 @@ import android.widget.EditText;
 
 import com.github.albalitz.save.R;
 import com.github.albalitz.save.activities.ApiActivity;
-import com.github.albalitz.save.activities.MainActivity;
-import com.github.albalitz.save.activities.SnackbarActivity;
 import com.github.albalitz.save.persistence.Link;
 import com.github.albalitz.save.persistence.SavePersistenceOption;
 import com.github.albalitz.save.persistence.Storage;

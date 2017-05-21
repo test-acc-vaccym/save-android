@@ -22,8 +22,7 @@ import com.github.albalitz.save.fragments.LinkActionsDialogFragment;
 import com.github.albalitz.save.fragments.SaveLinkDialogFragment;
 import com.github.albalitz.save.persistence.Link;
 import com.github.albalitz.save.persistence.SavePersistenceOption;
-import com.github.albalitz.save.persistence.api.Api;
-import com.github.albalitz.save.persistence.database.Database;
+import com.github.albalitz.save.persistence.Storage;
 import com.github.albalitz.save.persistence.export.SavedLinksExporter;
 import com.github.albalitz.save.utils.ActivityUtils;
 import com.github.albalitz.save.utils.LinkAdapter;
@@ -62,7 +61,7 @@ public class MainActivity extends AppCompatActivity
         listViewSavedLinks = (ListView) findViewById(R.id.listViewSavedLinks);
 
         // prepare stuff
-        setStorageToSettingChoice();
+        storage = Storage.getStorageSettingChoice(this);
         prepareListViewListeners();
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -102,27 +101,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
-        setStorageToSettingChoice();
+        storage = Storage.getStorageSettingChoice(this);
         storage.updateSavedLinks();
     }
 
-    private void setStorageToSettingChoice() {
-        if (prefs.getBoolean("pref_key_use_api_or_local", false)) {
-            Log.d(this.toString(), "Setting storage method: API.");
-            if (storage instanceof Api) {
-                Log.d(this.toString(), "No need to change storage.");
-                return;
-            }
-            storage = new Api(this);
-        } else {
-            Log.d(this.toString(), "Setting storage method: database.");
-            if (storage instanceof Database) {
-                Log.d(this.toString(), "No need to change storage.");
-                return;
-            }
-            storage = new Database(this);
-        }
-    }
 
 
 

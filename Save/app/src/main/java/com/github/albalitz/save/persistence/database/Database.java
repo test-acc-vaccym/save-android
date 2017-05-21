@@ -89,7 +89,13 @@ public class Database implements SavePersistenceOption {
         values.put(SaveDbContract.LinkEntry.COLUM_NAME_ANNOTATION, link.annotation());
 
         long newRowId = db.insert(SaveDbContract.LinkEntry.TABLE_NAME, null, values);
-        Utils.showSnackbar((SnackbarActivity) callingActivity, "Link saved.");
+        try {
+            Utils.showSnackbar((SnackbarActivity) callingActivity, "Link saved.");
+        } catch (ClassCastException e) {
+            // this happens, when sharing to the app and using this from the SaveLinkActivity.
+            // using a toast instead, as they can be displayed on top of another app
+            Utils.showToast((Context) callingActivity, "Link saved.");
+        }
         // also update the list view
         updateSavedLinks();
     }

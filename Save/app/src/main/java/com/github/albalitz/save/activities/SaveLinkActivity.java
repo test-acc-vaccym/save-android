@@ -6,13 +6,16 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.github.albalitz.save.fragments.SaveLinkDialogFragment;
+import com.github.albalitz.save.persistence.Link;
 import com.github.albalitz.save.utils.Utils;
+
+import java.util.ArrayList;
 
 /**
  * Created by albalitz on 5/21/17.
  */
 
-public class SaveLinkActivity extends Activity {
+public class SaveLinkActivity extends Activity implements ApiActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,5 +44,18 @@ public class SaveLinkActivity extends Activity {
         args.putString("url", sharedText);
         saveLinkDialogFragment.setArguments(args);
         saveLinkDialogFragment.show(getFragmentManager(), "save");
+    }
+
+    @Override
+    public void onSavedLinksUpdate(ArrayList<Link> savedLinks) {
+        this.finish();
+    }
+
+    @Override
+    public void onRegistrationError(String errorMessage) {
+    }
+
+    @Override
+    public void onRegistrationSuccess() {
     }
 }

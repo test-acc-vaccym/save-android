@@ -9,10 +9,12 @@ import android.os.Bundle;
 import android.widget.EditText;
 
 import com.github.albalitz.save.R;
+import com.github.albalitz.save.activities.ApiActivity;
 import com.github.albalitz.save.activities.MainActivity;
 import com.github.albalitz.save.activities.SnackbarActivity;
 import com.github.albalitz.save.persistence.Link;
 import com.github.albalitz.save.persistence.SavePersistenceOption;
+import com.github.albalitz.save.persistence.Storage;
 import com.github.albalitz.save.utils.Utils;
 
 import org.json.JSONException;
@@ -52,8 +54,8 @@ public class SaveLinkDialogFragment extends DialogFragment {
                 }
                 Link link = new Link(url, annotation);
 
-                Utils.showSnackbar((SnackbarActivity) listener, "Saving link...");
-                SavePersistenceOption storage = ((MainActivity) listener).getStorage();
+                //Utils.showSnackbar((SnackbarActivity) listener, "Saving link...");
+                SavePersistenceOption storage = Storage.getStorageSettingChoice((ApiActivity) listener);
                 try {
                     storage.saveLink(link);
                 } catch (JSONException e) {

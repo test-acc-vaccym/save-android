@@ -1,5 +1,6 @@
 package com.github.albalitz.save.persistence.api;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -108,7 +109,13 @@ public class Api implements SavePersistenceOption {
                     // todo: show error
                 }
 
-                Utils.showSnackbar((SnackbarActivity) callingActivity, "Link saved.");
+                try {
+                    Utils.showSnackbar((SnackbarActivity) callingActivity, "Link saved.");
+                } catch (ClassCastException e) {
+                    // this happens, when sharing to the app and using this from the SaveLinkActivity.
+                    // using a toast instead, as they can be displayed on top of another app
+                    Utils.showToast((Context) callingActivity, "Link saved.");
+                }
 
                 // also update the list view
                 updateSavedLinks();

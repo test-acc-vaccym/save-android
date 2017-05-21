@@ -62,11 +62,7 @@ public class MainActivity extends AppCompatActivity
         listViewSavedLinks = (ListView) findViewById(R.id.listViewSavedLinks);
 
         // prepare stuff
-        if (prefs.getBoolean("pref_key_use_api_or_local", false)) {
-            storage = new Api(this);
-        } else {
-            storage = new Database(this);
-        }
+        setStorageToSettingChoice();
         prepareListViewListeners();
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -101,38 +97,34 @@ public class MainActivity extends AppCompatActivity
         }
 
         storage.updateSavedLinks();
-
-        // Handle stuff being shared to this app from another app
-        Intent intent = getIntent();
-        String action = intent.getAction();
-        String type = intent.getType();
-        if (action.equals(Intent.ACTION_SEND) && type != null) {
-            if (type.equals("text/plain")) {
-                handleSendIntent(intent);
-            }
-        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        setStorageToSettingChoice();
         storage.updateSavedLinks();
     }
 
-    private void handleSendIntent(Intent intent) {
-        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-        if (sharedText == null) {
-            Utils.showToast(context, "No data found.");
-            finish();
+    private void setStorageToSettingChoice() {
+        if (prefs.getBoolean("pref_key_use_api_or_local", false)) {
+            Log.d(this.toString(), "Setting storage method: API.");
+            if (storage instanceof Api) {
+                Log.d(this.toString(), "No need to change storage.");
+                return;
+            }
+            storage = new Api(this);
+        } else {
+            Log.d(this.toString(), "Setting storage method: database.");
+            if (storage instanceof Database) {
+                Log.d(this.toString(), "No need to change storage.");
+                return;
+            }
+            storage = new Database(this);
         }
-
-        Log.d(this.toString(), "Got shared text: " + sharedText);
-        SaveLinkDialogFragment saveLinkDialogFragment = new SaveLinkDialogFragment();
-        Bundle args = new Bundle();
-        args.putString("url", sharedText);
-        saveLinkDialogFragment.setArguments(args);
-        saveLinkDialogFragment.show(getFragmentManager(), "save");
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

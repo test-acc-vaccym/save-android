@@ -64,7 +64,6 @@ public class SavedLinksExporter {
         }
 
         Log.i("SavedLinksExporter", "Exported to " + file.getAbsolutePath());
-        Utils.showToast(SaveApplication.getAppContext(), "Exported " + savedLinks.size() + " links to " + file.getPath());
         return true;
     }
 

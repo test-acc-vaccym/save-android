@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +27,7 @@ import com.github.albalitz.save.persistence.Link;
 import com.github.albalitz.save.persistence.SavePersistenceOption;
 import com.github.albalitz.save.persistence.Storage;
 import com.github.albalitz.save.persistence.export.SavedLinksExporter;
+import com.github.albalitz.save.persistence.export.ViewExportedFileListener;
 import com.github.albalitz.save.utils.ActivityUtils;
 import com.github.albalitz.save.utils.LinkAdapter;
 import com.github.albalitz.save.utils.Utils;
@@ -127,7 +129,7 @@ public class MainActivity extends AppCompatActivity
                 ActivityUtils.openSettings(this);
                 return true;
             case R.id.action_export:
-                SavedLinksExporter.export(this, savedLinks);
+                showExportConfirmation(SavedLinksExporter.export(this, savedLinks));
                 return true;
         }
 
@@ -141,12 +143,19 @@ public class MainActivity extends AppCompatActivity
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    SavedLinksExporter.export(this, savedLinks);
+                    showExportConfirmation(SavedLinksExporter.export(this, savedLinks));
                 } else {
                     Utils.showToast(context, "Please grant external storage permission to export.");
                 }
                 return;
             }
+        }
+    }
+
+    private void showExportConfirmation(boolean successfullyExported) {
+        if (successfullyExported) {
+            Snackbar.make(listViewSavedLinks, "Exported.", Snackbar.LENGTH_LONG)
+                .setAction("View", new ViewExportedFileListener()).show();
         }
     }
 

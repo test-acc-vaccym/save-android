@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity
 
     private void showExportConfirmation(boolean successfullyExported) {
         if (successfullyExported) {
-            Snackbar.make(listViewSavedLinks, "Exported.", Snackbar.LENGTH_LONG)
+            Snackbar.make(listViewSavedLinks, "Exported " + savedLinks.size() + " links.", Snackbar.LENGTH_LONG)
                 .setAction("View", new ViewExportedFileListener()).show();
         }
     }

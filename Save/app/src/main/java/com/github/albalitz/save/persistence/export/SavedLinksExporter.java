@@ -34,7 +34,7 @@ public class SavedLinksExporter {
             return false;  // done for now. This should be called again, when the user grants the permission.
         }
 
-        File file = getExportStorageDir("save-link-export.json");  // todo: preferences
+        File exportFile = Utils.getExportFile();
 
         if (savedLinks.isEmpty()) {
             Utils.showToast(SaveApplication.getAppContext(), "Nothing to export. Save something first. ;)");
@@ -51,7 +51,7 @@ public class SavedLinksExporter {
         }
 
         try {
-            FileWriter fileWriter = new FileWriter(file.getAbsolutePath());
+            FileWriter fileWriter = new FileWriter(exportFile.getAbsolutePath());
             fileWriter.write(savedLinksJson.toString(4));
             fileWriter.flush();
             fileWriter.close();
@@ -63,19 +63,7 @@ public class SavedLinksExporter {
             return false;
         }
 
-        Log.i("SavedLinksExporter", "Exported to " + file.getAbsolutePath());
+        Log.i("SavedLinksExporter", "Exported to " + exportFile.getAbsolutePath());
         return true;
-    }
-
-    private static File getExportStorageDir(String filename) {
-        File path = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), SaveApplication.getAppContext().getString(R.string.app_name));
-        File file = new File(path, filename);
-        file.setWritable(true);
-
-        Log.i("SavedLinksExporter", "Creating path: " + path.getAbsolutePath() + "; for file: " + filename);
-        if (!path.mkdirs() && !path.exists()) {
-            Log.e("SavedLinksExporter", "Couldn't create directory.");
-        }
-        return file;
     }
 }

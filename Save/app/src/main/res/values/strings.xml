@@ -22,4 +22,7 @@
 
     <!-- link sharing -->
     <string name="share_destination_chooser">Share link via...</string>
+
+    <!-- export -->
+    <string name="export_filename_default">export.json</string>
 </resources>

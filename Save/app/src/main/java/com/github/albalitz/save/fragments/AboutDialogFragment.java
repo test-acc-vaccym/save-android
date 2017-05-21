@@ -33,10 +33,16 @@ public class AboutDialogFragment extends DialogFragment {
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
+                // app name and version info
                 String appName = getString(R.string.app_name);
                 String versionName = BuildConfig.VERSION_NAME;
+                TextView textViewAppVersion = (TextView) getDialog().findViewById(R.id.textViewAppVersion);
+                textViewAppVersion.setText(appName + " v" + versionName);
+
+                // general app info
+                String appInfo = getString(R.string.app_description);
                 TextView textViewAppInfo = (TextView) getDialog().findViewById(R.id.textViewAppInfo);
-                textViewAppInfo.setText(appName + " v" + versionName);
+                textViewAppInfo.setText(appInfo);
             }
         });
 

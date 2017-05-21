@@ -26,4 +26,7 @@
 
     <!-- export -->
     <string name="export_filename_default">export.json</string>
+
+    <!-- about dialog -->
+    <string name="app_description">Save your links on the go to read them later.</string>
 </resources>

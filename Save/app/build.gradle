@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+apply from: 'https://raw.github.com/trikita/gradle-android-signing/master/gradle-android-signing-experimental.gradle'
+
 android {
     compileSdkVersion 23
     buildToolsVersion '25.0.0'

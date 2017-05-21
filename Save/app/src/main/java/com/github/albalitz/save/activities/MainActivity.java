@@ -22,8 +22,7 @@ import com.github.albalitz.save.fragments.LinkActionsDialogFragment;
 import com.github.albalitz.save.fragments.SaveLinkDialogFragment;
 import com.github.albalitz.save.persistence.Link;
 import com.github.albalitz.save.persistence.SavePersistenceOption;
-import com.github.albalitz.save.persistence.api.Api;
-import com.github.albalitz.save.persistence.database.Database;
+import com.github.albalitz.save.persistence.Storage;
 import com.github.albalitz.save.persistence.export.SavedLinksExporter;
 import com.github.albalitz.save.utils.ActivityUtils;
 import com.github.albalitz.save.utils.LinkAdapter;
@@ -62,11 +61,7 @@ public class MainActivity extends AppCompatActivity
         listViewSavedLinks = (ListView) findViewById(R.id.listViewSavedLinks);
 
         // prepare stuff
-        if (prefs.getBoolean("pref_key_use_api_or_local", false)) {
-            storage = new Api(this);
-        } else {
-            storage = new Database(this);
-        }
+        storage = Storage.getStorageSettingChoice(this);
         prepareListViewListeners();
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -101,38 +96,17 @@ public class MainActivity extends AppCompatActivity
         }
 
         storage.updateSavedLinks();
-
-        // Handle stuff being shared to this app from another app
-        Intent intent = getIntent();
-        String action = intent.getAction();
-        String type = intent.getType();
-        if (action.equals(Intent.ACTION_SEND) && type != null) {
-            if (type.equals("text/plain")) {
-                handleSendIntent(intent);
-            }
-        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        storage = Storage.getStorageSettingChoice(this);
         storage.updateSavedLinks();
     }
 
-    private void handleSendIntent(Intent intent) {
-        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-        if (sharedText == null) {
-            Utils.showToast(context, "No data found.");
-            finish();
-        }
 
-        Log.d(this.toString(), "Got shared text: " + sharedText);
-        SaveLinkDialogFragment saveLinkDialogFragment = new SaveLinkDialogFragment();
-        Bundle args = new Bundle();
-        args.putString("url", sharedText);
-        saveLinkDialogFragment.setArguments(args);
-        saveLinkDialogFragment.show(getFragmentManager(), "save");
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

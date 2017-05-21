@@ -4,7 +4,9 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -125,12 +127,29 @@ public class MainActivity extends AppCompatActivity
                 ActivityUtils.openSettings(this);
                 return true;
             case R.id.action_export:
-                SavedLinksExporter.export(savedLinks);
+                SavedLinksExporter.export(this, savedLinks);
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case SaveApplication.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    SavedLinksExporter.export(this, savedLinks);
+                } else {
+                    Utils.showToast(context, "Please grant external storage permission to export.");
+                }
+                return;
+            }
+        }
+    }
+
 
 
     @Override

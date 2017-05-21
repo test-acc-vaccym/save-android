@@ -11,6 +11,8 @@ import android.preference.PreferenceManager;
 public class SaveApplication extends Application {
     private static Context context;
 
+    public static final int PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 42;
+
     @Override
     public void onCreate() {
         super.onCreate();

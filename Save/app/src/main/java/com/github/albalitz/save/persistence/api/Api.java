@@ -123,7 +123,7 @@ public class Api implements SavePersistenceOption {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e("api.saveLink failure", errorResponse.toString());
+                Log.e("api.saveLink failure", "No connection?");
             }
         };
 

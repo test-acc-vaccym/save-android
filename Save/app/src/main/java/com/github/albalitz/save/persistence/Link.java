@@ -1,5 +1,7 @@
 package com.github.albalitz.save.persistence;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,11 +20,15 @@ public class Link {
      * e.g. an API response.
      */
     public Link(JSONObject json) throws JSONException {
-        this.id = json.getInt("id");
+        try {
+            this.id = json.getInt("id");
+            this.createdOn = json.getString("created_on");
+            this.updatedOn = json.getString("updated_on");
+        } catch (JSONException e) {
+            Log.w("Link", "JSON doesn't contain ID and/or dates.");
+        }
         this.url = json.getString("url");
         this.annotation = json.getString("annotation");
-        this.createdOn = json.getString("created_on");
-        this.updatedOn = json.getString("updated_on");
     }
 
     /**

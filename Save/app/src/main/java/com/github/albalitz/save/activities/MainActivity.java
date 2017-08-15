@@ -1,10 +1,13 @@
 package com.github.albalitz.save.activities;
 
 import android.app.DialogFragment;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -26,13 +29,19 @@ import com.github.albalitz.save.fragments.SaveLinkDialogFragment;
 import com.github.albalitz.save.persistence.Link;
 import com.github.albalitz.save.persistence.SavePersistenceOption;
 import com.github.albalitz.save.persistence.Storage;
+import com.github.albalitz.save.persistence.api.Api;
+import com.github.albalitz.save.persistence.api.OfflineQueue;
 import com.github.albalitz.save.persistence.export.SavedLinksExporter;
 import com.github.albalitz.save.persistence.export.ViewExportedFileListener;
 import com.github.albalitz.save.utils.ActivityUtils;
 import com.github.albalitz.save.utils.LinkAdapter;
 import com.github.albalitz.save.utils.Utils;
 
+import org.json.JSONException;
+
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements ApiActivity, LinkActionsDialogFragment.LinkActionListener, SnackbarActivity, SwipeRefreshLayout.OnRefreshListener {
@@ -78,6 +87,19 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i(this.toString(), "Connection changed!");
+                if (Utils.networkAvailable(context)) {
+                    saveQueuedLinks();
+                } else {
+                    Log.i(this.toString(), "Not connected.");
+                    return;
+                }
+            }
+        }, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
         // do actual stuff
         /*
          * Check for configuration and let the user know what to do accordingly:
@@ -99,6 +121,13 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+        try {
+            if (!OfflineQueue.getLinks().isEmpty()) {
+                saveQueuedLinks();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         storage.updateSavedLinks();
     }
 
@@ -108,8 +137,6 @@ public class MainActivity extends AppCompatActivity
         storage = Storage.getStorageSettingChoice(this);
         storage.updateSavedLinks();
     }
-
-
 
 
     @Override
@@ -163,7 +190,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
     @Override
     public void onSavedLinksUpdate(ArrayList<Link> savedLinks) {
         this.savedLinks = savedLinks;
@@ -198,6 +224,39 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         });
+    }
+
+    private void saveQueuedLinks() {
+        if (!(this.storage instanceof Api)) {
+            Log.w(this.toString(), "Not using API as persistence backend. Not trying to save queued links now!");
+            return;
+        }
+
+        List<Link> queuedLinks = new ArrayList<>();
+        try {
+            queuedLinks = OfflineQueue.getLinks();
+            OfflineQueue.dropLinks();  // in case of errors, they get queued again
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if (!queuedLinks.isEmpty()) {
+            Log.d(this.toString(), "Trying to save " + queuedLinks.size() + " queued links...");
+        }
+
+        for (Link link : queuedLinks) {
+            try {
+                storage.saveLink(link);
+            } catch (JSONException | UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (!queuedLinks.isEmpty()) {
+            Utils.showToast(this, "Saved queued links.");
+            Log.d(this.toString(), "Saved queued links.");
+            storage.updateSavedLinks();
+        }
     }
 
     public SavePersistenceOption getStorage() {

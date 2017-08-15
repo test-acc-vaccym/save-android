@@ -77,7 +77,8 @@ public class Api implements SavePersistenceOption {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                // todo
+                Log.e(this.toString(), "Can't update links from API.");
+                Utils.showToast((Context) callingActivity, "Can't reach API.");
             }
         };
 
@@ -91,7 +92,7 @@ public class Api implements SavePersistenceOption {
 
 
     @Override
-    public void saveLink(Link link) throws JSONException, UnsupportedEncodingException {
+    public void saveLink(final Link link) throws JSONException, UnsupportedEncodingException {
         Log.d("api", "Saving link: " + link.toString() + " ...");
 
         String url = this.prefs.getString("pref_key_api_url", null);
@@ -124,6 +125,14 @@ public class Api implements SavePersistenceOption {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 Log.e("api.saveLink failure", "No connection?");
+
+                try {
+                    OfflineQueue.addLink(link);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                Utils.showToast((Context) callingActivity, "Can't save link! Trying again later.");
             }
         };
 

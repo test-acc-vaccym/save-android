@@ -24,3 +24,5 @@ Dialog overlay when saving a link from another app
   Currently /sdcard/Documents/Save/save-link-export.json
 - Share links to other apps  
   send your links to another app to share with friends, or save in another app
+- Offline queue when saving with an api fails  
+  Your links will be queued and sent to the api again later.

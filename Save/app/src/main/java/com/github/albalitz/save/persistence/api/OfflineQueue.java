@@ -31,15 +31,16 @@ public class OfflineQueue {
         Editor preferenceEditor = preferences.edit();
         preferenceEditor.putStringSet(QUEUE_KEY, queuedLinks);
         preferenceEditor.apply();
-        Log.d("OfflineQueue", "Queued link.");
+        Log.d("OfflineQueue", "Queued link. Now in queue: " + queuedLinks.size());
     }
 
-    public static void dropLinks() {
-        Set<String> noLinks = new HashSet<>();
+    public static void dropLink(Link link) throws JSONException {
+        Set<String> queuedLinks = preferences.getStringSet(QUEUE_KEY, new HashSet<String>());
+        queuedLinks.remove(link.json().toString());
         Editor preferenceEditor = preferences.edit();
-        preferenceEditor.putStringSet(QUEUE_KEY, noLinks);
+        preferenceEditor.putStringSet(QUEUE_KEY, queuedLinks);
         preferenceEditor.apply();
-        Log.d("OfflineQueue", "Dropped queue.");
+        Log.d("OfflineQueue", "Dropped link: " + link + ". Now in queue: " + queuedLinks.size());
     }
 
     public static List<Link> getLinks() throws JSONException {
@@ -50,6 +51,7 @@ public class OfflineQueue {
             Link link = new Link(linkJson);
             links.add(link);
         }
+        Log.d("OfflineQueue", "Found " + links.size() + " queued links.");
         return links;
     }
 

@@ -21,6 +21,8 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
+import static com.github.albalitz.save.persistence.api.OfflineQueue.dropLink;
+
 /**
  * Created by albalitz on 3/24/17.
  */
@@ -116,6 +118,13 @@ public class Api implements SavePersistenceOption {
                     // this happens, when sharing to the app and using this from the SaveLinkActivity.
                     // using a toast instead, as they can be displayed on top of another app
                     Utils.showToast((Context) callingActivity, "Link saved.");
+                }
+
+                // If this was queued, it is no longer needed
+                try {
+                    dropLink(link);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
 
                 // also update the list view

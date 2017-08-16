@@ -224,7 +224,6 @@ public class MainActivity extends AppCompatActivity
         List<Link> queuedLinks = new ArrayList<>();
         try {
             queuedLinks = OfflineQueue.getLinks();
-            OfflineQueue.dropLinks();  // in case of errors, they get queued again
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -244,7 +243,6 @@ public class MainActivity extends AppCompatActivity
         if (!queuedLinks.isEmpty()) {
             Utils.showToast(this, "Saved queued links.");
             Log.d(this.toString(), "Saved queued links.");
-            storage.updateSavedLinks();
         }
     }
 

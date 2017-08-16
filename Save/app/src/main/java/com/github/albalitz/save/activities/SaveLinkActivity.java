@@ -52,6 +52,11 @@ public class SaveLinkActivity extends Activity implements ApiActivity {
     }
 
     @Override
+    public void onSaveDialogDone() {
+        this.finish();
+    }
+
+    @Override
     public void onRegistrationError(String errorMessage) {
     }
 

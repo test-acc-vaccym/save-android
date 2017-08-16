@@ -200,6 +200,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onSaveDialogDone() {}
+
+    @Override
     public void onRegistrationError(String errorMessage) {}
 
     @Override

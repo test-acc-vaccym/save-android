@@ -3,6 +3,8 @@ package com.github.albalitz.save.utils;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
@@ -66,5 +68,11 @@ public class Utils {
 
         Log.d("getExportFile", "Export file: " + exportFile.getAbsolutePath());
         return exportFile;
+    }
+
+    public static boolean networkAvailable(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnected();
     }
 }

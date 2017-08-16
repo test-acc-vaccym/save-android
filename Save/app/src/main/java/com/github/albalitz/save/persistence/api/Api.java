@@ -21,6 +21,8 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
+import static com.github.albalitz.save.persistence.api.OfflineQueue.dropLink;
+
 /**
  * Created by albalitz on 3/24/17.
  */
@@ -77,7 +79,8 @@ public class Api implements SavePersistenceOption {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                // todo
+                Log.e(this.toString(), "Can't update links from API.");
+                Utils.showToast((Context) callingActivity, "Can't reach API.");
             }
         };
 
@@ -91,7 +94,7 @@ public class Api implements SavePersistenceOption {
 
 
     @Override
-    public void saveLink(Link link) throws JSONException, UnsupportedEncodingException {
+    public void saveLink(final Link link) throws JSONException, UnsupportedEncodingException {
         Log.d("api", "Saving link: " + link.toString() + " ...");
 
         String url = this.prefs.getString("pref_key_api_url", null);
@@ -117,13 +120,28 @@ public class Api implements SavePersistenceOption {
                     Utils.showToast((Context) callingActivity, "Link saved.");
                 }
 
+                // If this was queued, it is no longer needed
+                try {
+                    dropLink(link);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 // also update the list view
                 updateSavedLinks();
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e("api.saveLink failure", errorResponse.toString());
+                Log.e("api.saveLink failure", "No connection?");
+
+                try {
+                    OfflineQueue.addLink(link);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                Utils.showToast((Context) callingActivity, "Can't save link! Queueing and trying again later.");
             }
         };
 

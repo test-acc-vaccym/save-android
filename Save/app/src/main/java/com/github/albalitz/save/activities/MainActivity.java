@@ -87,18 +87,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.i(this.toString(), "Connection changed!");
-                if (Utils.networkAvailable(context)) {
-                    saveQueuedLinks();
-                } else {
-                    Log.i(this.toString(), "Not connected.");
-                    return;
-                }
-            }
-        }, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        registerReceiver(new ConnectionChangeReceiver(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         // do actual stuff
         /*
@@ -316,5 +305,18 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onRefresh() {
         storage.updateSavedLinks();
+    }
+
+
+    public class ConnectionChangeReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i(this.toString(), "Connection changed!");
+            if (Utils.networkAvailable(context)) {
+                saveQueuedLinks();
+            } else {
+                Log.i(this.toString(), "Not connected.");
+            }
+        }
     }
 }

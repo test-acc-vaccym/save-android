@@ -10,6 +10,7 @@ import java.util.ArrayList;
  */
 public interface ApiActivity {
     void onSavedLinksUpdate(ArrayList<Link> savedLinks);
+    void onSaveDialogDone();
 
     void onRegistrationError(String errorMessage);
     void onRegistrationSuccess();

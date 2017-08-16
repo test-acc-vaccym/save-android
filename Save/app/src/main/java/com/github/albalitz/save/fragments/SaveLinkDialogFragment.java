@@ -61,11 +61,13 @@ public class SaveLinkDialogFragment extends DialogFragment {
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
+
+                ((ApiActivity) listener).onSaveDialogDone();
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                // User cancelled the dialog
+                ((ApiActivity) listener).onSaveDialogDone();
             }
         });
         AlertDialog dialog = builder.create();

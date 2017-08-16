@@ -126,6 +126,9 @@ public class RegisterActivity extends AppCompatActivity
     public void onSavedLinksUpdate(ArrayList<Link> savedLinks) {}
 
     @Override
+    public void onSaveDialogDone() {}
+
+    @Override
     public View viewFromActivity() {
         return findViewById(R.id.buttonRegister);
     }

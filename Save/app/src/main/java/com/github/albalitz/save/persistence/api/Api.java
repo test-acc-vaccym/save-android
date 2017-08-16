@@ -132,7 +132,7 @@ public class Api implements SavePersistenceOption {
                     e.printStackTrace();
                 }
 
-                Utils.showToast((Context) callingActivity, "Can't save link! Trying again later.");
+                Utils.showToast((Context) callingActivity, "Can't save link! Queueing and trying again later.");
             }
         };
 

@@ -24,6 +24,10 @@ public class SaveApplication extends Application {
         return SaveApplication.context;
     }
 
+    public static void setAppContext(Context context) {
+        SaveApplication.context = context;
+    }
+
     public static SharedPreferences getSharedPreferences() {
         return PreferenceManager.getDefaultSharedPreferences(SaveApplication.getAppContext());
     }

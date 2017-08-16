@@ -1,7 +1,6 @@
 package com.github.albalitz.save.activities;
 
 import android.app.DialogFragment;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -29,7 +28,7 @@ import com.github.albalitz.save.fragments.SaveLinkDialogFragment;
 import com.github.albalitz.save.persistence.Link;
 import com.github.albalitz.save.persistence.SavePersistenceOption;
 import com.github.albalitz.save.persistence.Storage;
-import com.github.albalitz.save.persistence.api.Api;
+import com.github.albalitz.save.persistence.api.ConnectionChangeReceiver;
 import com.github.albalitz.save.persistence.api.OfflineQueue;
 import com.github.albalitz.save.persistence.export.SavedLinksExporter;
 import com.github.albalitz.save.persistence.export.ViewExportedFileListener;
@@ -39,9 +38,9 @@ import com.github.albalitz.save.utils.Utils;
 
 import org.json.JSONException;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.List;
+
+import static com.github.albalitz.save.SaveApplication.setAppContext;
 
 public class MainActivity extends AppCompatActivity
         implements ApiActivity, LinkActionsDialogFragment.LinkActionListener, SnackbarActivity, SwipeRefreshLayout.OnRefreshListener {
@@ -59,6 +58,8 @@ public class MainActivity extends AppCompatActivity
 
     private SharedPreferences prefs = SaveApplication.getSharedPreferences();
 
+    private ConnectionChangeReceiver connectionChangeReceiver = new ConnectionChangeReceiver();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         this.context = this;
+        setAppContext(this.context);
 
         // assign content
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
@@ -87,7 +89,9 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        registerReceiver(new ConnectionChangeReceiver(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
+        Log.d(this.toString(), "Registering connectionReceiver...");
+        registerReceiver(connectionChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         // do actual stuff
         /*
@@ -112,7 +116,7 @@ public class MainActivity extends AppCompatActivity
 
         try {
             if (!OfflineQueue.getLinks().isEmpty()) {
-                saveQueuedLinks();
+                OfflineQueue.saveQueuedLinks();
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -125,6 +129,14 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         storage = Storage.getStorageSettingChoice(this);
         storage.updateSavedLinks();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        try {
+            unregisterReceiver(connectionChangeReceiver);
+        } catch (IllegalArgumentException ignored) {}
     }
 
 
@@ -215,37 +227,6 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private void saveQueuedLinks() {
-        if (!(this.storage instanceof Api)) {
-            Log.w(this.toString(), "Not using API as persistence backend. Not trying to save queued links now!");
-            return;
-        }
-
-        List<Link> queuedLinks = new ArrayList<>();
-        try {
-            queuedLinks = OfflineQueue.getLinks();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        if (!queuedLinks.isEmpty()) {
-            Log.d(this.toString(), "Trying to save " + queuedLinks.size() + " queued links...");
-        }
-
-        for (Link link : queuedLinks) {
-            try {
-                storage.saveLink(link);
-            } catch (JSONException | UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (!queuedLinks.isEmpty()) {
-            Utils.showToast(this, "Saved queued links.");
-            Log.d(this.toString(), "Saved queued links.");
-        }
-    }
-
     public SavePersistenceOption getStorage() {
         return this.storage;
     }
@@ -305,16 +286,4 @@ public class MainActivity extends AppCompatActivity
         storage.updateSavedLinks();
     }
 
-
-    public class ConnectionChangeReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.i(this.toString(), "Connection changed!");
-            if (Utils.networkAvailable(context)) {
-                saveQueuedLinks();
-            } else {
-                Log.i(this.toString(), "Not connected.");
-            }
-        }
-    }
 }

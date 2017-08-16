@@ -6,15 +6,23 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.github.albalitz.save.SaveApplication;
+import com.github.albalitz.save.activities.ApiActivity;
+import com.github.albalitz.save.activities.MainActivity;
 import com.github.albalitz.save.persistence.Link;
+import com.github.albalitz.save.persistence.SavePersistenceOption;
+import com.github.albalitz.save.persistence.Storage;
+import com.github.albalitz.save.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.github.albalitz.save.utils.Utils.storageSettingChoiceIsAPI;
 
 /**
  * Created by albalitz on 8/15/17.
@@ -53,6 +61,48 @@ public class OfflineQueue {
         }
         Log.d("OfflineQueue", "Found " + links.size() + " queued links.");
         return links;
+    }
+
+    public static void saveQueuedLinks() {
+        if (!storageSettingChoiceIsAPI()) {
+            Log.w("OfflineQueue", "Not using API as persistence backend. Not trying to save queued links now!");
+            return;
+        }
+        if (!Utils.networkAvailable(SaveApplication.getAppContext())) {
+            Log.w("OfflineQueue", "No network available. Not trying to save queued links.");
+            return;
+        }
+
+        SavePersistenceOption storage;
+        try {
+            storage = ((MainActivity) SaveApplication.getAppContext()).getStorage();
+        } catch (ClassCastException e) {
+            return;
+        }
+
+        List<Link> queuedLinks = new ArrayList<>();
+        try {
+            queuedLinks = OfflineQueue.getLinks();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if (!queuedLinks.isEmpty()) {
+            Log.d("OfflineQueue", "Trying to save " + queuedLinks.size() + " queued links...");
+        }
+
+        for (Link link : queuedLinks) {
+            try {
+                storage.saveLink(link);
+            } catch (JSONException | UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (!queuedLinks.isEmpty()) {
+            Utils.showToast(SaveApplication.getAppContext(), "Saved queued links.");
+            Log.d("OfflineQueue", "Saved queued links.");
+        }
     }
 
 }

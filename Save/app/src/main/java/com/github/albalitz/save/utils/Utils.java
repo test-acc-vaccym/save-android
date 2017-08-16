@@ -14,7 +14,11 @@ import android.widget.Toast;
 
 import com.github.albalitz.save.R;
 import com.github.albalitz.save.SaveApplication;
+import com.github.albalitz.save.activities.ApiActivity;
 import com.github.albalitz.save.activities.SnackbarActivity;
+import com.github.albalitz.save.persistence.SavePersistenceOption;
+import com.github.albalitz.save.persistence.api.Api;
+import com.github.albalitz.save.persistence.database.Database;
 
 import java.io.File;
 
@@ -74,5 +78,9 @@ public class Utils {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnected();
+    }
+
+    public static boolean storageSettingChoiceIsAPI() {
+        return SaveApplication.getSharedPreferences().getBoolean("pref_key_use_api_or_local", false);
     }
 }

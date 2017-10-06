@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity
 
     private void setOfflineQueueButtonVisibility() {
         int queueSize = offlineQueue.queuedCount();
-        if (queueSize > 0 && Utils.networkAvailable(this)) {
+        if (Utils.storageSettingChoiceIsAPI() && queueSize > 0 && Utils.networkAvailable(this)) {
             saveQueuedLinksButton.setVisibility(View.VISIBLE);
             String buttonText = "Save " + offlineQueue.queuedCount() + " queued links";
             saveQueuedLinksButton.setText(buttonText);

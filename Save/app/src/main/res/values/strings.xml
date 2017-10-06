@@ -32,4 +32,6 @@
 
     <!-- messages -->
     <string name="link_queued_message">Link queued. You can try again later.</string>
+    <string name="no_link_message">You currently have no link saved. Go ahead and save something. ;)</string>
+    <string name="no_connection_message">No connection to API. :(</string>
 </resources>

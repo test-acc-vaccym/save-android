@@ -23,7 +23,9 @@ public class Request {
     }
 
     public static void post(String url, String username, String password, JSONObject json, AsyncHttpResponseHandler responseHandler) throws UnsupportedEncodingException {
-        client.setBasicAuth(username, password);
+        if (username != null && password != null) {
+            client.setBasicAuth(username, password);
+        }
 
         // See http://stackoverflow.com/questions/13052036/posting-json-xml-using-android-async-http-loopj
         // for the example I based this on.

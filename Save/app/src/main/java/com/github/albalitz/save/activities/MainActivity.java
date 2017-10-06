@@ -78,8 +78,6 @@ public class MainActivity extends AppCompatActivity
         });
 
         // prepare stuff
-        storage = Storage.getStorageSettingChoice(this);
-        offlineQueue = new OfflineQueue(this);
         prepareListViewListeners();
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -118,6 +116,7 @@ public class MainActivity extends AppCompatActivity
     public void onResume() {
         super.onResume();
         storage = Storage.getStorageSettingChoice(this);
+        offlineQueue = new OfflineQueue(this);
         try {
             storage.updateSavedLinks();
         } catch (IllegalArgumentException e) {

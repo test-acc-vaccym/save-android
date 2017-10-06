@@ -52,7 +52,7 @@ public class OfflineQueue {
         } catch (ClassCastException e) {
             // this happens, when sharing to the app and using this from the SaveLinkActivity.
             // using a toast instead, as they can be displayed on top of another app
-            Utils.showToast(this.callingActivity, "Link saved.");
+            Utils.showToast(this.callingActivity, "Link queued until the connection is restored.");
         }
     }
 
@@ -134,6 +134,7 @@ public class OfflineQueue {
             return;
         } else {
             Log.d("OfflineQueue", "Trying to save " + queuedLinks.size() + " queued links...");
+            Utils.showSnackbar((SnackbarActivity) this.callingActivity, "Saving queued links...");
         }
 
         for (Link link : queuedLinks) {

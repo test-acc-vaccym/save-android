@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.github.albalitz.save.R;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity
     private OfflineQueue offlineQueue;
     private SharedPreferences prefs = SaveApplication.getSharedPreferences();
 
-    private final static int MENU_SAVE_QUEUE_ID = 42;
+    private Button saveQueuedLinksButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,13 @@ public class MainActivity extends AppCompatActivity
         // assign content
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         listViewSavedLinks = (ListView) findViewById(R.id.listViewSavedLinks);
+        saveQueuedLinksButton = (Button) findViewById(R.id.saveQueuedLinksButton);
+        saveQueuedLinksButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                offlineQueue.saveQueuedLinks();
+            }
+        });
 
         // prepare stuff
         storage = Storage.getStorageSettingChoice(this);
@@ -104,16 +112,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-
-        if (!offlineQueue.getLinks().isEmpty()) {
-            offlineQueue.saveQueuedLinks();
-        }
-        try {
-            storage.updateSavedLinks();
-        } catch (IllegalArgumentException e) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
-        }
     }
 
     @Override
@@ -126,6 +124,7 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         }
+        setOfflineQueueButtonVisibility();
     }
 
 
@@ -133,12 +132,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
-        int queueSize = offlineQueue.queuedCount();
-        if (queueSize > 0) {
-            CharSequence title = "Save " + offlineQueue.queuedCount() + " queued links.";
-            menu.add(0, MENU_SAVE_QUEUE_ID, 1, title);
-        }
         return true;
     }
 
@@ -156,9 +149,6 @@ public class MainActivity extends AppCompatActivity
                 return true;
             case R.id.action_about:
                 ActivityUtils.showAboutDialog(this);
-                return true;
-            case MENU_SAVE_QUEUE_ID:
-                offlineQueue.saveQueuedLinks();
                 return true;
         }
 
@@ -188,6 +178,19 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void setOfflineQueueButtonVisibility() {
+        int queueSize = offlineQueue.queuedCount();
+        if (queueSize > 0 && Utils.networkAvailable(this)) {
+            saveQueuedLinksButton.setVisibility(View.VISIBLE);
+            String buttonText = "Save " + offlineQueue.queuedCount() + " queued links";
+            saveQueuedLinksButton.setText(buttonText);
+        } else {
+            saveQueuedLinksButton.setVisibility(View.GONE);
+        }
+    }
+
+
+
 
     @Override
     public void onSavedLinksUpdate(ArrayList<Link> savedLinks) {
@@ -195,6 +198,7 @@ public class MainActivity extends AppCompatActivity
         adapter = new LinkAdapter(this, savedLinks);
         this.listViewSavedLinks.setAdapter(adapter);
         this.swipeRefreshLayout.setRefreshing(false);
+        setOfflineQueueButtonVisibility();
     }
 
     @Override

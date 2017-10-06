@@ -20,6 +20,7 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -95,6 +96,7 @@ public class Api implements SavePersistenceOption {
                 if (callingActivity != null) {
                     Utils.showToast((Context) callingActivity, "Can't reach API.");
                 }
+                callingActivity.onSavedLinksUpdate(new ArrayList<Link>());  // cause the same callbacks as on success but without any links
             }
         };
 
@@ -150,6 +152,7 @@ public class Api implements SavePersistenceOption {
                 if (callingActivity != null) {
                     Utils.showToast((Context) callingActivity, "Can't save link! Queueing and trying again later.");
                 }
+                callingActivity.onSavedLinksUpdate(new ArrayList<Link>());  // cause the same callbacks as on success but without any links
             }
         };
 
@@ -190,7 +193,8 @@ public class Api implements SavePersistenceOption {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                // todo
+                Utils.showToast((Context) callingActivity, "Deleting link failed. Try again later.");
+                callingActivity.onSavedLinksUpdate(new ArrayList<Link>());  // cause the same callbacks as on success but without any links
             }
         };
 

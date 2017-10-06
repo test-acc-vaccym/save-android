@@ -26,14 +26,12 @@ import com.github.albalitz.save.fragments.SaveLinkDialogFragment;
 import com.github.albalitz.save.persistence.Link;
 import com.github.albalitz.save.persistence.SavePersistenceOption;
 import com.github.albalitz.save.persistence.Storage;
-import com.github.albalitz.save.persistence.api.OfflineQueue;
 import com.github.albalitz.save.persistence.export.SavedLinksExporter;
 import com.github.albalitz.save.persistence.export.ViewExportedFileListener;
+import com.github.albalitz.save.persistence.offline_queue.OfflineQueue;
 import com.github.albalitz.save.utils.ActivityUtils;
 import com.github.albalitz.save.utils.LinkAdapter;
 import com.github.albalitz.save.utils.Utils;
-
-import org.json.JSONException;
 
 import java.util.ArrayList;
 
@@ -52,9 +50,10 @@ public class MainActivity extends AppCompatActivity
     private Link selectedLink;
 
     private SavePersistenceOption storage;
-
+    private OfflineQueue offlineQueue;
     private SharedPreferences prefs = SaveApplication.getSharedPreferences();
 
+    private final static int MENU_SAVE_QUEUE_ID = 42;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +71,7 @@ public class MainActivity extends AppCompatActivity
 
         // prepare stuff
         storage = Storage.getStorageSettingChoice(this);
+        offlineQueue = new OfflineQueue(this);
         prepareListViewListeners();
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -105,29 +105,27 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        try {
-            if (!OfflineQueue.getLinks().isEmpty()) {
-                OfflineQueue.saveQueuedLinks();
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (!offlineQueue.getLinks().isEmpty()) {
+            offlineQueue.saveQueuedLinks();
         }
-        storage.updateSavedLinks();
+        try {
+            storage.updateSavedLinks();
+        } catch (IllegalArgumentException e) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
         storage = Storage.getStorageSettingChoice(this);
-        storage.updateSavedLinks();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
         try {
-            unregisterReceiver(connectionChangeReceiver);
-        } catch (IllegalArgumentException ignored) {}
+            storage.updateSavedLinks();
+        } catch (IllegalArgumentException e) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+        }
     }
 
 
@@ -135,6 +133,12 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        int queueSize = offlineQueue.queuedCount();
+        if (queueSize > 0) {
+            CharSequence title = "Save " + offlineQueue.queuedCount() + " queued links.";
+            menu.add(0, MENU_SAVE_QUEUE_ID, 1, title);
+        }
         return true;
     }
 
@@ -152,6 +156,9 @@ public class MainActivity extends AppCompatActivity
                 return true;
             case R.id.action_about:
                 ActivityUtils.showAboutDialog(this);
+                return true;
+            case MENU_SAVE_QUEUE_ID:
+                offlineQueue.saveQueuedLinks();
                 return true;
         }
 

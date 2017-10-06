@@ -7,8 +7,10 @@ import android.util.Log;
 import com.github.albalitz.save.SaveApplication;
 import com.github.albalitz.save.activities.ApiActivity;
 import com.github.albalitz.save.activities.SnackbarActivity;
+import com.github.albalitz.save.persistence.ApiUser;
 import com.github.albalitz.save.persistence.Link;
 import com.github.albalitz.save.persistence.SavePersistenceOption;
+import com.github.albalitz.save.persistence.offline_queue.OfflineQueue;
 import com.github.albalitz.save.utils.Utils;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -21,8 +23,6 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
-import static com.github.albalitz.save.persistence.api.OfflineQueue.dropLink;
-
 /**
  * Created by albalitz on 3/24/17.
  */
@@ -30,10 +30,18 @@ public class Api implements SavePersistenceOption {
 
     private SharedPreferences prefs;
     private ApiActivity callingActivity;
+    private ApiUser caller;
+
+    private OfflineQueue offlineQueue;
 
     public Api(ApiActivity callingActivity) {
         this.prefs = SaveApplication.getSharedPreferences();
         this.callingActivity = callingActivity;
+        this.offlineQueue = new OfflineQueue((Context) callingActivity);
+    }
+
+    public Api(ApiUser caller) {
+        this.caller = caller;
     }
 
     // todo: edit a link
@@ -74,13 +82,19 @@ public class Api implements SavePersistenceOption {
                     }
                 }
 
-                callingActivity.onSavedLinksUpdate(savedLinks);
+                if (callingActivity != null) {
+                    callingActivity.onSavedLinksUpdate(savedLinks);
+                } else {
+                    caller.onSavedLinksUpdate(savedLinks);
+                }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 Log.e(this.toString(), "Can't update links from API.");
-                Utils.showToast((Context) callingActivity, "Can't reach API.");
+                if (callingActivity != null) {
+                    Utils.showToast((Context) callingActivity, "Can't reach API.");
+                }
             }
         };
 
@@ -121,11 +135,7 @@ public class Api implements SavePersistenceOption {
                 }
 
                 // If this was queued, it is no longer needed
-                try {
-                    dropLink(link);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                offlineQueue.dropLink(link);
 
                 // also update the list view
                 updateSavedLinks();
@@ -135,13 +145,11 @@ public class Api implements SavePersistenceOption {
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 Log.e("api.saveLink failure", "No connection?");
 
-                try {
-                    OfflineQueue.addLink(link);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                offlineQueue.addLink(link);
 
-                Utils.showToast((Context) callingActivity, "Can't save link! Queueing and trying again later.");
+                if (callingActivity != null) {
+                    Utils.showToast((Context) callingActivity, "Can't save link! Queueing and trying again later.");
+                }
             }
         };
 
@@ -172,10 +180,12 @@ public class Api implements SavePersistenceOption {
                     // todo: show error
                 }
 
-                Utils.showSnackbar((SnackbarActivity) callingActivity, "Deleted link.");
+                if (callingActivity != null) {
+                    Utils.showSnackbar((SnackbarActivity) callingActivity, "Deleted link.");
 
-                // also update the list view
-                updateSavedLinks();
+                    // also update the list view
+                    updateSavedLinks();
+                }
             }
 
             @Override
@@ -194,7 +204,7 @@ public class Api implements SavePersistenceOption {
 
 
     public void registerUser(final String username, final String password) throws JSONException, UnsupportedEncodingException {
-        Log.d("api", "Registering user ...");
+        Log.d("api", "Registering user: " + username + " ...");
 
         String url = this.prefs.getString("pref_key_api_url", null);
         if (url == null) {
@@ -217,7 +227,9 @@ public class Api implements SavePersistenceOption {
                         .putString("pref_key_api_password", password)
                         .apply();
 
-                callingActivity.onRegistrationSuccess();
+                if (callingActivity != null) {
+                    callingActivity.onRegistrationSuccess();
+                }
             }
 
             @Override

@@ -16,6 +16,7 @@ import java.util.ArrayList;
  */
 
 public class SaveLinkActivity extends Activity implements ApiActivity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

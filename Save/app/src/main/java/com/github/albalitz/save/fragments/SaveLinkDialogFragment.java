@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 
 import com.github.albalitz.save.R;
@@ -18,6 +19,8 @@ import com.github.albalitz.save.utils.Utils;
 import org.json.JSONException;
 
 import java.io.UnsupportedEncodingException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by albalitz on 3/24/17.
@@ -27,7 +30,15 @@ public class SaveLinkDialogFragment extends DialogFragment {
     private Activity listener;
 
     private String url;
+    private String annotation;
     // todo: support editing already saved links
+
+    // stolen from https://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url#3809435
+    private final String URL_REGEX = "(https?|ftp|mailto|file)://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_+.~#?&/=]*)";
+    private final String PATTERN_STRING = "(.+)?(" + URL_REGEX + ")(.+)?";
+    private final int PATTERN_GROUP_URL = 2;
+    private final int PATTERN_GROUP_ANNOTATION_BEFORE = 1;
+    private final int PATTERN_GROUP_ANNOTATION_AFTER = 4;
 
     @Override
     public void onAttach(Activity activity) {
@@ -82,14 +93,55 @@ public class SaveLinkDialogFragment extends DialogFragment {
                     return;
                 }
 
-                url = args.getString("url", null);
+                String shared = args.getString("url", null);
+                url = extractUrl(shared);
                 if (!url.isEmpty()) {
                     EditText urlEditText = (EditText) getDialog().findViewById(R.id.save_dialog_link_url);
                     urlEditText.setText(url);
+                }
+                annotation = extractAnnotation(shared);
+                if (!annotation.isEmpty()) {
+                    EditText annotationEditText = (EditText) getDialog().findViewById(R.id.save_dialog_link_annotation);
+                    annotationEditText.setText(annotation);
                 }
             }
         });
 
         return dialog;
+    }
+
+    private String extractUrl(String s) {
+        Log.d(this.toString(), "Extracting url from '" + s + "...");
+        Pattern pattern = Pattern.compile(PATTERN_STRING);
+        Matcher matcher = pattern.matcher(s);
+        while (matcher.find()) {
+            String match = matcher.group(PATTERN_GROUP_URL);
+            if (match != null) {
+                return match;
+            }
+        }
+        return "";
+    }
+
+    private String extractAnnotation(String s) {
+        Log.d(this.toString(), "Extracting url from '" + s + "...");
+        Pattern pattern = Pattern.compile(PATTERN_STRING);
+        Matcher matcher = pattern.matcher(s);
+
+        String annotations = "";
+        while (matcher.find()) {
+            String match = matcher.group(PATTERN_GROUP_ANNOTATION_BEFORE);
+            if (match != null) {
+                annotations += " " + match;
+            }
+        }
+        while (matcher.find()) {
+            String match = matcher.group(PATTERN_GROUP_ANNOTATION_AFTER);
+            if (match != null) {
+                annotations += " " + match;
+            }
+        }
+
+        return annotations.trim();
     }
 }

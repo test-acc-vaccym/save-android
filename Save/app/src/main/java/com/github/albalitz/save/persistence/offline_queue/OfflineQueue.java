@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.github.albalitz.save.R;
 import com.github.albalitz.save.SaveApplication;
 import com.github.albalitz.save.activities.MainActivity;
 import com.github.albalitz.save.activities.SnackbarActivity;
@@ -48,11 +49,11 @@ public class OfflineQueue {
 
         long newRowId = db.insert(QueueDbContract.LinkEntry.TABLE_NAME, null, values);
         try {
-            Utils.showSnackbar((SnackbarActivity) this.callingActivity, "Link queued until the connection is restored.");
+            Utils.showSnackbar((SnackbarActivity) this.callingActivity, callingActivity.getString(R.string.link_queued_message));
         } catch (ClassCastException e) {
             // this happens, when sharing to the app and using this from the SaveLinkActivity.
             // using a toast instead, as they can be displayed on top of another app
-            Utils.showToast(this.callingActivity, "Link queued until the connection is restored.");
+            Utils.showToast(this.callingActivity, callingActivity.getString(R.string.link_queued_message));
         }
     }
 

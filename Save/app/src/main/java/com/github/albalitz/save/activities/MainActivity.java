@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setOfflineQueueButtonVisibility() {
+        Log.d(this.toString(), "Updating offline queue button...");
         int queueSize = offlineQueue.queuedCount();
         if (Utils.storageSettingChoiceIsAPI() && queueSize > 0 && Utils.networkAvailable(this)) {
             saveQueuedLinksButton.setVisibility(View.VISIBLE);

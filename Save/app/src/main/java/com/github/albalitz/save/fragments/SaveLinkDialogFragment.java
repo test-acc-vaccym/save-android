@@ -142,6 +142,7 @@ public class SaveLinkDialogFragment extends DialogFragment {
             }
         }
 
+        annotations = annotations.replaceAll("- *$", "");
         return annotations.trim();
     }
 }

@@ -148,10 +148,6 @@ public class Api implements SavePersistenceOption {
                 Log.e("api.saveLink failure", "No connection?");
 
                 offlineQueue.addLink(link);
-
-                if (callingActivity != null) {
-                    Utils.showToast((Context) callingActivity, "Can't save link! Queueing and trying again later.");
-                }
                 callingActivity.onSavedLinksUpdate(new ArrayList<Link>());  // cause the same callbacks as on success but without any links
             }
         };

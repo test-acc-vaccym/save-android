@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.github.albalitz.save.R;
 import com.github.albalitz.save.SaveApplication;
@@ -124,6 +125,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
         }
         setOfflineQueueButtonVisibility();
+        setMessageTextView();
     }
 
 
@@ -189,6 +191,22 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void setMessageTextView() {
+        Log.d(this.toString(), "Updating message text view...");
+        TextView messageTextView = (TextView) findViewById(R.id.messageTextView);
+        if (Utils.storageSettingChoiceIsAPI() && !Utils.networkAvailable(this)) {
+            messageTextView.setText(getString(R.string.no_connection_message));
+        } else if (savedLinks.isEmpty()) {
+            messageTextView.setText(getString(R.string.no_link_message));
+        } else {
+            messageTextView.setText("");
+            messageTextView.setVisibility(View.GONE);
+            return;
+        }
+
+        messageTextView.setVisibility(View.VISIBLE);
+    }
+
 
 
 
@@ -199,6 +217,7 @@ public class MainActivity extends AppCompatActivity
         this.listViewSavedLinks.setAdapter(adapter);
         this.swipeRefreshLayout.setRefreshing(false);
         setOfflineQueueButtonVisibility();
+        setMessageTextView();
     }
 
     @Override

@@ -3,10 +3,8 @@ package com.github.albalitz.save.activities;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -19,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.github.albalitz.save.R;
@@ -28,15 +27,12 @@ import com.github.albalitz.save.fragments.SaveLinkDialogFragment;
 import com.github.albalitz.save.persistence.Link;
 import com.github.albalitz.save.persistence.SavePersistenceOption;
 import com.github.albalitz.save.persistence.Storage;
-import com.github.albalitz.save.persistence.api.ConnectionChangeReceiver;
-import com.github.albalitz.save.persistence.api.OfflineQueue;
 import com.github.albalitz.save.persistence.export.SavedLinksExporter;
 import com.github.albalitz.save.persistence.export.ViewExportedFileListener;
+import com.github.albalitz.save.persistence.offline_queue.OfflineQueue;
 import com.github.albalitz.save.utils.ActivityUtils;
 import com.github.albalitz.save.utils.LinkAdapter;
 import com.github.albalitz.save.utils.Utils;
-
-import org.json.JSONException;
 
 import java.util.ArrayList;
 
@@ -55,11 +51,10 @@ public class MainActivity extends AppCompatActivity
     private Link selectedLink;
 
     private SavePersistenceOption storage;
-
+    private OfflineQueue offlineQueue;
     private SharedPreferences prefs = SaveApplication.getSharedPreferences();
 
-    private ConnectionChangeReceiver connectionChangeReceiver = new ConnectionChangeReceiver();
-
+    private Button saveQueuedLinksButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,9 +69,17 @@ public class MainActivity extends AppCompatActivity
         // assign content
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         listViewSavedLinks = (ListView) findViewById(R.id.listViewSavedLinks);
+        saveQueuedLinksButton = (Button) findViewById(R.id.saveQueuedLinksButton);
+        saveQueuedLinksButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                offlineQueue.saveQueuedLinks();
+            }
+        });
 
         // prepare stuff
         storage = Storage.getStorageSettingChoice(this);
+        offlineQueue = new OfflineQueue(this);
         prepareListViewListeners();
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -88,10 +91,6 @@ public class MainActivity extends AppCompatActivity
                 saveLinkDialogFragment.show(getFragmentManager(), "save");
             }
         });
-
-
-        Log.d(this.toString(), "Registering connectionReceiver...");
-        registerReceiver(connectionChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         // do actual stuff
         /*
@@ -113,30 +112,19 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-
-        try {
-            if (!OfflineQueue.getLinks().isEmpty()) {
-                OfflineQueue.saveQueuedLinks();
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        storage.updateSavedLinks();
     }
 
     @Override
     public void onResume() {
         super.onResume();
         storage = Storage.getStorageSettingChoice(this);
-        storage.updateSavedLinks();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
         try {
-            unregisterReceiver(connectionChangeReceiver);
-        } catch (IllegalArgumentException ignored) {}
+            storage.updateSavedLinks();
+        } catch (IllegalArgumentException e) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+        }
+        setOfflineQueueButtonVisibility();
     }
 
 
@@ -190,6 +178,19 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void setOfflineQueueButtonVisibility() {
+        int queueSize = offlineQueue.queuedCount();
+        if (queueSize > 0 && Utils.networkAvailable(this)) {
+            saveQueuedLinksButton.setVisibility(View.VISIBLE);
+            String buttonText = "Save " + offlineQueue.queuedCount() + " queued links";
+            saveQueuedLinksButton.setText(buttonText);
+        } else {
+            saveQueuedLinksButton.setVisibility(View.GONE);
+        }
+    }
+
+
+
 
     @Override
     public void onSavedLinksUpdate(ArrayList<Link> savedLinks) {
@@ -197,6 +198,7 @@ public class MainActivity extends AppCompatActivity
         adapter = new LinkAdapter(this, savedLinks);
         this.listViewSavedLinks.setAdapter(adapter);
         this.swipeRefreshLayout.setRefreshing(false);
+        setOfflineQueueButtonVisibility();
     }
 
     @Override

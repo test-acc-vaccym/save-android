@@ -105,9 +105,7 @@ public class RegisterActivity extends AppCompatActivity
         String password = editTextPassword.getText().toString();
         try {
             api.registerUser(username, password);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
+        } catch (JSONException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }

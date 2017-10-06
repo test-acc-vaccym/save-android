@@ -29,4 +29,7 @@
 
     <!-- about dialog -->
     <string name="app_description">Save your links on the go to read them later.</string>
+
+    <!-- messages -->
+    <string name="link_queued_message">Link queued. You can try again later.</string>
 </resources>

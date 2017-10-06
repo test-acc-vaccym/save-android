@@ -3,10 +3,8 @@ package com.github.albalitz.save.activities;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -28,7 +26,6 @@ import com.github.albalitz.save.fragments.SaveLinkDialogFragment;
 import com.github.albalitz.save.persistence.Link;
 import com.github.albalitz.save.persistence.SavePersistenceOption;
 import com.github.albalitz.save.persistence.Storage;
-import com.github.albalitz.save.persistence.api.ConnectionChangeReceiver;
 import com.github.albalitz.save.persistence.api.OfflineQueue;
 import com.github.albalitz.save.persistence.export.SavedLinksExporter;
 import com.github.albalitz.save.persistence.export.ViewExportedFileListener;
@@ -58,8 +55,6 @@ public class MainActivity extends AppCompatActivity
 
     private SharedPreferences prefs = SaveApplication.getSharedPreferences();
 
-    private ConnectionChangeReceiver connectionChangeReceiver = new ConnectionChangeReceiver();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,10 +83,6 @@ public class MainActivity extends AppCompatActivity
                 saveLinkDialogFragment.show(getFragmentManager(), "save");
             }
         });
-
-
-        Log.d(this.toString(), "Registering connectionReceiver...");
-        registerReceiver(connectionChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         // do actual stuff
         /*

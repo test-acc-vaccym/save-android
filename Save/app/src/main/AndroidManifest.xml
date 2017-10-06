@@ -13,11 +13,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <receiver android:name=".persistence.api.ConnectionChangeReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.CONNECTIVITY_ACTION" />
-            </intent-filter>
-        </receiver>
 
         <activity
             android:name=".activities.MainActivity"

@@ -34,6 +34,8 @@ import com.github.albalitz.save.persistence.offline_queue.OfflineQueue;
 import com.github.albalitz.save.utils.ActivityUtils;
 import com.github.albalitz.save.utils.LinkAdapter;
 import com.github.albalitz.save.utils.Utils;
+import com.github.albalitz.save.utils.temporary_sharedpreference.TemporaryPreference;
+import com.github.albalitz.save.utils.temporary_sharedpreference.TemporarySharedPreferenceHandler;
 
 import java.util.ArrayList;
 
@@ -145,9 +147,6 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_settings:
                 ActivityUtils.openSettings(this);
                 return true;
-            case R.id.action_export:
-                showExportConfirmation(SavedLinksExporter.export(this, savedLinks));
-                return true;
             case R.id.action_about:
                 ActivityUtils.showAboutDialog(this);
                 return true;
@@ -207,6 +206,20 @@ public class MainActivity extends AppCompatActivity
         messageTextView.setVisibility(View.VISIBLE);
     }
 
+    private void handleTempPrefs() {
+        if (TemporarySharedPreferenceHandler.popTemporarySharedPreferenceValue(TemporaryPreference.EXPORT)) {
+            boolean exportResult = SavedLinksExporter.export(this, savedLinks);
+            showExportConfirmation(exportResult);
+        }
+
+        if (TemporarySharedPreferenceHandler.popTemporarySharedPreferenceValue(TemporaryPreference.DELETE_ALL)) {
+            Utils.showToast(this, "Deleting all saved links...");
+            // todo: do this in the storage option with one call
+            for (Link link : savedLinks) {
+                storage.deleteLink(link);
+            }
+        }
+    }
 
 
 
@@ -218,6 +231,7 @@ public class MainActivity extends AppCompatActivity
         this.swipeRefreshLayout.setRefreshing(false);
         setOfflineQueueButtonVisibility();
         setMessageTextView();
+        handleTempPrefs();
     }
 
     @Override

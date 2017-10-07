@@ -34,6 +34,8 @@ import com.github.albalitz.save.persistence.offline_queue.OfflineQueue;
 import com.github.albalitz.save.utils.ActivityUtils;
 import com.github.albalitz.save.utils.LinkAdapter;
 import com.github.albalitz.save.utils.Utils;
+import com.github.albalitz.save.utils.temporary_sharedpreference.TemporaryPreference;
+import com.github.albalitz.save.utils.temporary_sharedpreference.TemporarySharedPreferenceHandler;
 
 import java.util.ArrayList;
 
@@ -126,6 +128,7 @@ public class MainActivity extends AppCompatActivity
         }
         setOfflineQueueButtonVisibility();
         setMessageTextView();
+        handleTempPrefs();
     }
 
 
@@ -207,6 +210,12 @@ public class MainActivity extends AppCompatActivity
         messageTextView.setVisibility(View.VISIBLE);
     }
 
+    private void handleTempPrefs() {
+        if (TemporarySharedPreferenceHandler.popTemporarySharedPreferenceValue(TemporaryPreference.EXPORT)) {
+            boolean exportResult = SavedLinksExporter.export(this, savedLinks);
+            showExportConfirmation(exportResult);
+        }
+    }
 
 
 

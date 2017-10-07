@@ -7,7 +7,6 @@ import android.util.Log;
 import com.github.albalitz.save.SaveApplication;
 import com.github.albalitz.save.activities.ApiActivity;
 import com.github.albalitz.save.activities.SnackbarActivity;
-import com.github.albalitz.save.persistence.ApiUser;
 import com.github.albalitz.save.persistence.Link;
 import com.github.albalitz.save.persistence.SavePersistenceOption;
 import com.github.albalitz.save.persistence.offline_queue.OfflineQueue;
@@ -20,7 +19,6 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -31,7 +29,6 @@ public class Api implements SavePersistenceOption {
 
     private SharedPreferences prefs;
     private ApiActivity callingActivity;
-    private ApiUser caller;
 
     private OfflineQueue offlineQueue;
 
@@ -39,10 +36,6 @@ public class Api implements SavePersistenceOption {
         this.prefs = SaveApplication.getSharedPreferences();
         this.callingActivity = callingActivity;
         this.offlineQueue = new OfflineQueue((Context) callingActivity);
-    }
-
-    public Api(ApiUser caller) {
-        this.caller = caller;
     }
 
     // todo: edit a link
@@ -83,19 +76,13 @@ public class Api implements SavePersistenceOption {
                     }
                 }
 
-                if (callingActivity != null) {
-                    callingActivity.onSavedLinksUpdate(savedLinks);
-                } else {
-                    caller.onSavedLinksUpdate(savedLinks);
-                }
+                callingActivity.onSavedLinksUpdate(savedLinks);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 Log.e(this.toString(), "Can't update links from API.");
-                if (callingActivity != null) {
-                    Utils.showToast((Context) callingActivity, "Can't reach Save API.");
-                }
+                Utils.showToast((Context) callingActivity, "Can't reach Save API.");
                 callingActivity.onSavedLinksUpdate(new ArrayList<Link>());  // cause the same callbacks as on success but without any links
             }
         };
@@ -190,12 +177,10 @@ public class Api implements SavePersistenceOption {
                     }
                 }
 
-                if (callingActivity != null) {
-                    Utils.showSnackbar((SnackbarActivity) callingActivity, "Deleted link.");
+                Utils.showSnackbar((SnackbarActivity) callingActivity, "Deleted link.");
 
-                    // also update the list view
-                    updateSavedLinks();
-                }
+                // also update the list view
+                updateSavedLinks();
             }
 
             @Override
@@ -243,9 +228,7 @@ public class Api implements SavePersistenceOption {
                         .putString("pref_key_api_password", password)
                         .apply();
 
-                if (callingActivity != null) {
-                    callingActivity.onRegistrationSuccess();
-                }
+                callingActivity.onRegistrationSuccess();
             }
 
             @Override

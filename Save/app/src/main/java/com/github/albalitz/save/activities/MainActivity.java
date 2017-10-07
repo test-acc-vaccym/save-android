@@ -128,7 +128,6 @@ public class MainActivity extends AppCompatActivity
         }
         setOfflineQueueButtonVisibility();
         setMessageTextView();
-        handleTempPrefs();
     }
 
 
@@ -147,9 +146,6 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.action_settings:
                 ActivityUtils.openSettings(this);
-                return true;
-            case R.id.action_export:
-                showExportConfirmation(SavedLinksExporter.export(this, savedLinks));
                 return true;
             case R.id.action_about:
                 ActivityUtils.showAboutDialog(this);
@@ -227,6 +223,7 @@ public class MainActivity extends AppCompatActivity
         this.swipeRefreshLayout.setRefreshing(false);
         setOfflineQueueButtonVisibility();
         setMessageTextView();
+        handleTempPrefs();
     }
 
     @Override

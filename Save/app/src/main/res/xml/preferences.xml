@@ -72,7 +72,8 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="Export">
+        android:title="Export"
+        android:key="pref_cat_export">
         <EditTextPreference
             android:key="pref_key_export_location"
             android:title="Export Filename"

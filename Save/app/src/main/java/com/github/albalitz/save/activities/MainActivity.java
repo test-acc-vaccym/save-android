@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity
         TextView messageTextView = (TextView) findViewById(R.id.messageTextView);
         if (Utils.storageSettingChoiceIsAPI() && !Utils.networkAvailable(this)) {
             messageTextView.setText(getString(R.string.no_connection_message));
-        } else if (savedLinks.isEmpty()) {
+        } else if (savedLinks != null && savedLinks.isEmpty()) {
             messageTextView.setText(getString(R.string.no_link_message));
         } else {
             messageTextView.setText("");

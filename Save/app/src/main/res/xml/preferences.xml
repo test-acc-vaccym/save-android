@@ -100,4 +100,14 @@
                 android:data="https://github.com/albalitz/save-android/issues" />
         </Preference>
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_danger_zone">
+        <PreferenceScreen
+            android:key="pref_cat_danger_zone"
+            android:title="@string/pref_danger_zone"
+            android:summary="@string/pref_danger_zone_summary">
+            <!-- content added in com.github.albalitz.save.fragments.SettingsFragment -->
+        </PreferenceScreen>
+    </PreferenceCategory>
 </PreferenceScreen>

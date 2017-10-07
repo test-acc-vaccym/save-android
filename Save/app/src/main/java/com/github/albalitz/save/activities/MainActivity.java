@@ -211,6 +211,14 @@ public class MainActivity extends AppCompatActivity
             boolean exportResult = SavedLinksExporter.export(this, savedLinks);
             showExportConfirmation(exportResult);
         }
+
+        if (TemporarySharedPreferenceHandler.popTemporarySharedPreferenceValue(TemporaryPreference.DELETE_ALL)) {
+            Utils.showToast(this, "Deleting all saved links...");
+            // todo: do this in the storage option with one call
+            for (Link link : savedLinks) {
+                storage.deleteLink(link);
+            }
+        }
     }
 
 

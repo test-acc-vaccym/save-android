@@ -15,6 +15,7 @@ import android.widget.ListView;
 import com.github.albalitz.save.R;
 import com.github.albalitz.save.SaveApplication;
 import com.github.albalitz.save.activities.MainActivity;
+import com.github.albalitz.save.activities.RegisterActivity;
 import com.github.albalitz.save.utils.Utils;
 import com.github.albalitz.save.utils.temporary_sharedpreference.TemporaryPreference;
 import com.github.albalitz.save.utils.temporary_sharedpreference.TemporarySharedPreferenceHandler;
@@ -26,10 +27,13 @@ import java.util.List;
  * Created by albalitz on 3/24/17.
  */
 public class SettingsFragment extends PreferenceFragment {
+
+    private Context context;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final Context context = SaveApplication.getAppContext();
+        context = SaveApplication.getAppContext();
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
@@ -39,18 +43,35 @@ public class SettingsFragment extends PreferenceFragment {
          */
         // export
         PreferenceCategory exportPreferenceCategory = (PreferenceCategory) getPreferenceManager().findPreference("pref_cat_export");
-        Preference preference = new Preference(context);
-        preference.setTitle(R.string.pref_export);
-        preference.setSummary(R.string.pref_export_summary);
-        preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        Preference exportPref = new Preference(context);
+        exportPref.setTitle(R.string.pref_export);
+        exportPref.setSummary(R.string.pref_export_summary);
+        exportPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 TemporarySharedPreferenceHandler.putTemporarySharedPreferenceValue(TemporaryPreference.EXPORT, true);
-                Utils.showToast(context, "Your links will be exported when you view the saved list.");
+                switchToMainActivity();
                 return true;
             }
         });
-        exportPreferenceCategory.addPreference(preference);
+        exportPreferenceCategory.addPreference(exportPref);
+
+        // dangerous stuff
+        PreferenceScreen dangerZone = (PreferenceScreen) getPreferenceManager().findPreference("pref_cat_danger_zone");
+
+        // delete all links
+        Preference deleteAllPref = new Preference(context);
+        deleteAllPref.setTitle(R.string.pref_delete_all);
+        deleteAllPref.setSummary(R.string.pref_delete_all_summary);
+        deleteAllPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                TemporarySharedPreferenceHandler.putTemporarySharedPreferenceValue(TemporaryPreference.DELETE_ALL, true);
+                switchToMainActivity();
+                return true;
+            }
+        });
+        dangerZone.addPreference(deleteAllPref);
 
         setValuesAsSummary();
     }
@@ -71,5 +92,10 @@ public class SettingsFragment extends PreferenceFragment {
                 pref.setSummary(setValue);
             }
         }
+    }
+
+    private void switchToMainActivity() {
+        Intent intent = new Intent(context, MainActivity.class);
+        startActivity(intent);
     }
 }

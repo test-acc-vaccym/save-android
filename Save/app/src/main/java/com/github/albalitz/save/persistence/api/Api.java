@@ -94,7 +94,7 @@ public class Api implements SavePersistenceOption {
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 Log.e(this.toString(), "Can't update links from API.");
                 if (callingActivity != null) {
-                    Utils.showToast((Context) callingActivity, "Can't reach API.");
+                    Utils.showToast((Context) callingActivity, "Can't reach Save API.");
                 }
                 callingActivity.onSavedLinksUpdate(new ArrayList<Link>());  // cause the same callbacks as on success but without any links
             }
@@ -125,7 +125,12 @@ public class Api implements SavePersistenceOption {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 if (!response.has("success")) {
-                    // todo: show error
+                    try {
+                        Utils.showToast((Context) callingActivity, "Error: " + response.getString("error"));
+                    } catch (JSONException e) {
+                        Utils.showToast((Context) callingActivity, "Error.");
+                        e.printStackTrace();
+                    }
                 }
 
                 try {
@@ -146,6 +151,7 @@ public class Api implements SavePersistenceOption {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 Log.e("api.saveLink failure", "No connection?");
+                Utils.showToast((Context) callingActivity, "Can't reach Save API.");
 
                 offlineQueue.addLink(link);
                 callingActivity.onSavedLinksUpdate(new ArrayList<Link>());  // cause the same callbacks as on success but without any links
@@ -176,7 +182,12 @@ public class Api implements SavePersistenceOption {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 if (!response.has("success")) {
-                    // todo: show error
+                    try {
+                        Utils.showToast((Context) callingActivity, "Error: " + response.getString("error"));
+                    } catch (JSONException e) {
+                        Utils.showToast((Context) callingActivity, "Error.");
+                        e.printStackTrace();
+                    }
                 }
 
                 if (callingActivity != null) {
@@ -218,7 +229,12 @@ public class Api implements SavePersistenceOption {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 if (!response.has("success")) {
-                    // todo: show error
+                    try {
+                        Utils.showToast((Context) callingActivity, "Error: " + response.getString("error"));
+                    } catch (JSONException e) {
+                        Utils.showToast((Context) callingActivity, "Error.");
+                        e.printStackTrace();
+                    }
                 }
 
                 Log.i("api register success", "Persisting newly registered user to preferences.");
@@ -235,6 +251,7 @@ public class Api implements SavePersistenceOption {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 Log.e("api.register failure", errorResponse.toString());
+                Utils.showToast((Context) callingActivity, "Can't reach Save API.");
             }
         };
 

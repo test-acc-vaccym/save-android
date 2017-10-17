@@ -10,8 +10,8 @@ An Android app for saving links to articles etc. on the go so you can read them 
   Choose between using the [API](https://github.com/albalitz/save-api) so you can access your links on other devices, or keep them offline on your phone.
 - Choose the sort order  
   Either oldest first (default) or newest first.
-- Export  
-  Save your saved links to a json file on your phone's external storage.  
+- Import/Export  
+  Save and restore your saved links to/from a json file on your phone's external storage.  
   Currently /sdcard/Documents/Save/save-link-export.json
 - Share links to other apps  
   send your links to another app to share with friends, or save in another app

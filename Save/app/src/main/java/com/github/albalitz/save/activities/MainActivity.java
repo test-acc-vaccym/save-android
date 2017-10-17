@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity
             Utils.showToast(this.context, "Can't import links. Please check your exported file for correct JSON syntax.");
         } catch (IOException e) {
             e.printStackTrace();
-            Utils.showToast(this.context, "An error occurred while trying to read the file. :(");
+            Utils.showToast(this.context, "Error while reading file. Please check the app's permissions and if the file exists.");
         }
     }
 

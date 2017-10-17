@@ -40,6 +40,7 @@ public class SettingsFragment extends PreferenceFragment {
 
         /*
          * add fancy settings "buttons" that do stuff when clicking them
+         * TODO: move to activities and start a corresponding intent (see e.g. DeauthAllTokensActivity)
          */
         // export
         PreferenceCategory exportPreferenceCategory = (PreferenceCategory) getPreferenceManager().findPreference("pref_cat_export");

@@ -50,6 +50,18 @@
                 </PreferenceCategory>
 
                 <PreferenceCategory
+                    android:title="Log out">
+                    <Preference
+                        android:title="Log out of all sessions"
+                        android:summary="Invalidates every auth token connected to your account."
+                        android:dependency="pref_key_api_url">
+                        <intent android:action="android.intent.action.VIEW"
+                            android:targetClass="com.github.albalitz.save.activities.DeauthAllTokensActivity"
+                            android:targetPackage="com.github.albalitz.save" />
+                    </Preference>
+                </PreferenceCategory>
+
+                <PreferenceCategory
                     android:title="Sign up">
                     <Preference
                         android:title="Register a new account"

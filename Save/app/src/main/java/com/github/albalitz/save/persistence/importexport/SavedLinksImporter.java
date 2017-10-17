@@ -35,6 +35,9 @@ public class SavedLinksImporter {
             return null;  // done for now. This should be called again, when the user grants the permission.
         }
 
+        Utils.showToast(context, "Importing links...");
+        Log.d("SavedLinksImporter", "Importing links...");
+
         File exportFile = Utils.getExportFile();
         exportFile.setReadable(true);
 

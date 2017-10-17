@@ -1,6 +1,5 @@
 package com.github.albalitz.save.activities;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -36,7 +35,9 @@ public class DeauthAllTokensActivity extends AppCompatActivity {
     private void deauthAllTokens() {
         String url = this.prefs.getString("pref_key_api_url", null);
         if (url == null) {
-            Log.e(this.toString(), "No URL set in the preferences!");
+            String msg = "No URL set in the preferences! Can't deauthenticate tokens.";
+            Log.e(this.toString(), msg);
+            Utils.showToast(getApplicationContext(), msg);
             return;
         } else {
             url += "/token/invalidate/all";

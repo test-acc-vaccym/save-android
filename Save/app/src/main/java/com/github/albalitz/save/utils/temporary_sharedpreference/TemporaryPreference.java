@@ -5,8 +5,9 @@ package com.github.albalitz.save.utils.temporary_sharedpreference;
  * This avoids accidentally deleting something important by setting a custom key.
  */
 public enum TemporaryPreference {
+    DELETE_ALL("delete_all"),
     EXPORT("export"),
-    DELETE_ALL("delete_all");
+    IMPORT("import");
 
     public final String pref;
 

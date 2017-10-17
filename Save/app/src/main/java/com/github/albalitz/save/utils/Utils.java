@@ -14,11 +14,7 @@ import android.widget.Toast;
 
 import com.github.albalitz.save.R;
 import com.github.albalitz.save.SaveApplication;
-import com.github.albalitz.save.activities.ApiActivity;
 import com.github.albalitz.save.activities.SnackbarActivity;
-import com.github.albalitz.save.persistence.SavePersistenceOption;
-import com.github.albalitz.save.persistence.api.Api;
-import com.github.albalitz.save.persistence.database.Database;
 
 import java.io.File;
 

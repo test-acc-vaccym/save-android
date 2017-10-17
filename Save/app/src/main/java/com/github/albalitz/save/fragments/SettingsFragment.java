@@ -42,8 +42,8 @@ public class SettingsFragment extends PreferenceFragment {
          * add fancy settings "buttons" that do stuff when clicking them
          * TODO: move to activities and start a corresponding intent (see e.g. DeauthAllTokensActivity)
          */
+        PreferenceCategory importExportPreferenceCategory = (PreferenceCategory) getPreferenceManager().findPreference("pref_cat_importexport");
         // export
-        PreferenceCategory exportPreferenceCategory = (PreferenceCategory) getPreferenceManager().findPreference("pref_cat_export");
         Preference exportPref = new Preference(context);
         exportPref.setTitle(R.string.pref_export);
         exportPref.setSummary(R.string.pref_export_summary);
@@ -55,7 +55,21 @@ public class SettingsFragment extends PreferenceFragment {
                 return true;
             }
         });
-        exportPreferenceCategory.addPreference(exportPref);
+        importExportPreferenceCategory.addPreference(exportPref);
+        // import
+        Preference importPref = new Preference(context);
+        importPref.setTitle(R.string.pref_import);
+        importPref.setSummary(R.string.pref_import_summary);
+        importPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                TemporarySharedPreferenceHandler.putTemporarySharedPreferenceValue(TemporaryPreference.IMPORT, true);
+                switchToMainActivity();
+                return true;
+            }
+        });
+        importExportPreferenceCategory.addPreference(importPref);
+
 
         // dangerous stuff
         PreferenceScreen dangerZone = (PreferenceScreen) getPreferenceManager().findPreference("pref_cat_danger_zone");

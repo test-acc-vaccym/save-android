@@ -12,6 +12,7 @@ public class SaveApplication extends Application {
     private static Context context;
 
     public static final int PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 42;
+    public static final int PERMISSION_REQUEST_READ_EXTERNAL_STORAGE = 43;
 
     @Override
     public void onCreate() {

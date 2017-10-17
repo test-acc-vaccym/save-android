@@ -56,6 +56,20 @@ public class SettingsFragment extends PreferenceFragment {
             }
         });
         importExportPreferenceCategory.addPreference(exportPref);
+        // import
+        Preference importPref = new Preference(context);
+        importPref.setTitle(R.string.pref_import);
+        importPref.setSummary(R.string.pref_import_summary);
+        importPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                TemporarySharedPreferenceHandler.putTemporarySharedPreferenceValue(TemporaryPreference.IMPORT, true);
+                switchToMainActivity();
+                return true;
+            }
+        });
+        importExportPreferenceCategory.addPreference(importPref);
+
 
         // dangerous stuff
         PreferenceScreen dangerZone = (PreferenceScreen) getPreferenceManager().findPreference("pref_cat_danger_zone");

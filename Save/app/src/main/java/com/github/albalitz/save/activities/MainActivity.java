@@ -29,6 +29,7 @@ import com.github.albalitz.save.persistence.Link;
 import com.github.albalitz.save.persistence.SavePersistenceOption;
 import com.github.albalitz.save.persistence.Storage;
 import com.github.albalitz.save.persistence.importexport.SavedLinksExporter;
+import com.github.albalitz.save.persistence.importexport.SavedLinksImporter;
 import com.github.albalitz.save.persistence.importexport.ViewExportedFileListener;
 import com.github.albalitz.save.persistence.offline_queue.OfflineQueue;
 import com.github.albalitz.save.utils.ActivityUtils;
@@ -37,6 +38,9 @@ import com.github.albalitz.save.utils.Utils;
 import com.github.albalitz.save.utils.temporary_sharedpreference.TemporaryPreference;
 import com.github.albalitz.save.utils.temporary_sharedpreference.TemporarySharedPreferenceHandler;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static com.github.albalitz.save.SaveApplication.setAppContext;
@@ -168,6 +172,15 @@ public class MainActivity extends AppCompatActivity
                 }
                 return;
             }
+            case SaveApplication.PERMISSION_REQUEST_READ_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    importLinks();
+                } else {
+                    Utils.showToast(context, "Please grant external storage permission to import.");
+                }
+                return;
+            }
         }
     }
 
@@ -175,6 +188,12 @@ public class MainActivity extends AppCompatActivity
         if (successfullyExported) {
             Snackbar.make(listViewSavedLinks, "Exported " + savedLinks.size() + " links.", Snackbar.LENGTH_LONG)
                 .setAction("View", new ViewExportedFileListener()).show();
+        }
+    }
+
+    private void showImportConfirmation(ArrayList importedLinks) {
+        if (importedLinks != null && importedLinks.size() > 0) {
+            Snackbar.make(listViewSavedLinks, "Imported " + importedLinks.size() + " links.", Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -213,12 +232,29 @@ public class MainActivity extends AppCompatActivity
             showExportConfirmation(exportResult);
         }
 
+        if (TemporarySharedPreferenceHandler.popTemporarySharedPreferenceValue(TemporaryPreference.IMPORT)) {
+            importLinks();
+        }
+
         if (TemporarySharedPreferenceHandler.popTemporarySharedPreferenceValue(TemporaryPreference.DELETE_ALL)) {
             Utils.showToast(this, "Deleting all saved links...");
             // todo: do this in the storage option with one call
             for (Link link : savedLinks) {
                 storage.deleteLink(link);
             }
+        }
+    }
+
+    private void importLinks() {
+        try {
+            ArrayList<Link> importResult = SavedLinksImporter.importLinks(this.context, this.storage);
+            showImportConfirmation(importResult);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Utils.showToast(this.context, "Can't import links. Please check your exported file for correct JSON syntax.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Utils.showToast(this.context, "An error occurred while trying to read the file. :(");
         }
     }
 

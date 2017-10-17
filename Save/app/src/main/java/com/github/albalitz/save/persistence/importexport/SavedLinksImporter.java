@@ -46,7 +46,7 @@ public class SavedLinksImporter {
             fileContent.append(new String(buffer, 0, readBytes));
         }
 
-        JSONArray linksJSON = new JSONArray();
+        JSONArray linksJSON;
         try {
             Log.d("SavedLinksImported", "Trying to parse Links from JSON: " + fileContent.toString());
             linksJSON = new JSONArray(fileContent.toString());

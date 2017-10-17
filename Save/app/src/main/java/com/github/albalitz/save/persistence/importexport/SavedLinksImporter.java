@@ -27,11 +27,11 @@ import java.util.ArrayList;
  */
 public class SavedLinksImporter {
     public static ArrayList<Link> importLinks(Context context, SavePersistenceOption persistenceOption) throws JSONException, IOException {
-        int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE);
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions((Activity) context,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    SaveApplication.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE);
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    SaveApplication.PERMISSION_REQUEST_READ_EXTERNAL_STORAGE);
             return null;  // done for now. This should be called again, when the user grants the permission.
         }
 
@@ -48,7 +48,7 @@ public class SavedLinksImporter {
 
         JSONArray linksJSON;
         try {
-            Log.d("SavedLinksImported", "Trying to parse Links from JSON: " + fileContent.toString());
+            Log.d("SavedLinksImporter", "Trying to parse Links from JSON: " + fileContent.toString());
             linksJSON = new JSONArray(fileContent.toString());
         } catch (JSONException e) {
             e.printStackTrace();

@@ -1,4 +1,6 @@
 # Save
+[![Build Status](https://travis-ci.org/albalitz/save-android.svg)](https://travis-ci.org/albalitz/save-android)
+
 An Android app for saving links to articles etc. on the go so you can read them later.
 
 ## Features

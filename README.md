@@ -19,11 +19,8 @@ An Android app for saving links to articles etc. on the go so you can read them 
   Your links will be queued and you can send them to the api again later.
 
 ## Screenshots
-<img src="screenshots/add_dialog.jpg" width="50%"></a>  
-Dialog for saving a link
-
-<img src="screenshots/link_saved.jpg" width="50%"></a>  
-Saved link and confirmation
-
-<img src="screenshots/share_overlay.jpg" width="50%"></a>  
-Dialog overlay when saving a link from another app
+| **Dialog for saving a link** | **Saved link and confirmation** |
+| :--------------------------: | :-----------------------------: |
+| ![add_dialog](screenshots/add_dialog.jpg) | ![saved_confirmation](screenshots/link_saved.jpg) |
+| **Dialog overlay when saving a link from another app** | |
+| ![share_overlay](screenshots/share_overlay.jpg) | |
